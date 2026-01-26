@@ -7,6 +7,7 @@ import { BuildStatusBadge, BuildStatus } from './badges/build-status-badge';
 import { VersionBadge } from './badges/version-badge';
 import { CoverageBadge } from './badges/coverage-badge';
 import { LicenseBadge } from './badges/license-badge';
+import { rootPageHtml } from './templates/root-page';
 
 interface Env {
   // Add any environment variables here
@@ -19,15 +20,17 @@ export default {
 
     try {
       // Route to appropriate badge handler
-      if (path.startsWith('/badge/build-status')) {
+      if (path.startsWith('/build-status')) {
         return handleBuildStatusBadge(url);
-      } else if (path.startsWith('/badge/version')) {
+      } else if (path.startsWith('/version')) {
         return handleVersionBadge(url);
-      } else if (path.startsWith('/badge/coverage')) {
+      } else if (path.startsWith('/coverage')) {
         return handleCoverageBadge(url);
-      } else if (path.startsWith('/badge/license')) {
+      } else if (path.startsWith('/license')) {
         return handleLicenseBadge(url);
-      } else if (path === '/' || path === '/health') {
+      } else if (path === '/') {
+        return handleRootPage();
+      } else if (path === '/health') {
         return handleHealthCheck();
       } else {
         return handleNotFound();
@@ -123,7 +126,19 @@ async function handleLicenseBadge(url: URL): Promise<Response> {
 }
 
 /**
- * Handle health check and root path
+ * Handle root page with HTML documentation
+ */
+function handleRootPage(): Response {
+  return new Response(rootPageHtml, {
+    headers: {
+      'Content-Type': 'text/html;charset=UTF-8',
+      'Cache-Control': 'public, max-age=3600',
+    },
+  });
+}
+
+/**
+ * Handle health check endpoint
  */
 function handleHealthCheck(): Response {
   return new Response(
@@ -132,10 +147,10 @@ function handleHealthCheck(): Response {
       service: 'Animated Badge API',
       version: '1.0.0',
       endpoints: [
-        '/badge/build-status',
-        '/badge/version',
-        '/badge/coverage',
-        '/badge/license',
+        '/build-status',
+        '/version',
+        '/coverage',
+        '/license',
       ],
     }),
     {
@@ -154,7 +169,7 @@ function handleNotFound(): Response {
   return new Response(
     JSON.stringify({
       error: 'Not Found',
-      message: 'Badge endpoint not found. Check /health for available endpoints.',
+      message: 'Badge endpoint not found.',
     }),
     {
       status: 404,

@@ -4,29 +4,7 @@
 name = "animated-badge-service"
 main = "src/worker.ts"
 compatibility_date = "2024-01-01"
+workers_dev = false
 
-# Account configuration
-# account_id = "" # Uncomment and add your account ID
-
-# Worker configuration
 [build]
 command = "pnpm build"
-
-# Environment variables (optional)
-# [vars]
-# API_KEY = ""
-
-# Production environment
-# [env.production]
-# routes = [
-#   { pattern = "badge.example.com/*", zone_name = "example.com" }
-# ]
-
-# Development environment
-[env.dev]
-name = "animated-badge-service-dev"
-
-# KV Namespaces (if needed for caching)
-# [[kv_namespaces]]
-# binding = "BADGE_CACHE"
-# id = "..."

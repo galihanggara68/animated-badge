@@ -10,6 +10,22 @@ A production-ready animated badge system using **pure SVG animations** (no CSS, 
 - **Data-Driven** - Animations triggered by actual data changes
 - **Cloudflare Workers** - Global edge deployment
 - **TypeScript** - Fully typed for maintainability
+- **Interactive Playground** - Try badges live before using them
+
+## 🎮 Interactive Playground
+
+Try out the badges interactively with our live playground:
+
+**[🚀 Try the Playground](https://badges.datenblick.space)**
+
+Features:
+- Real-time badge preview
+- Interactive controls for all badge parameters
+- Quick preset buttons for common configurations
+- Live URL generation for easy copying
+- Dark/light theme support
+
+Experiment with different parameters and see the badges update instantly!
 
 ## Badge Types
 
@@ -20,7 +36,7 @@ A production-ready animated badge system using **pure SVG animations** (no CSS, 
 **Animation:** Pulse effect on success status
 
 ```markdown
-![Build Status](https://your-worker.workers.dev/badge/build-status?status=success)
+![Build Status](https://badges.datenblick.space/build-status?status=success)
 ```
 
 **Query Parameters:**
@@ -31,13 +47,13 @@ A production-ready animated badge system using **pure SVG animations** (no CSS, 
 **Examples:**
 ```bash
 # Success build (with pulse)
-/badge/build-status?status=success
+/build-status?status=success
 
 # Failed build (no animation)
-/badge/build-status?status=failed
+/build-status?status=failed
 
 # Custom label and message
-/badge/build-status?status=success&label=ci&message=passing
+/build-status?status=success&label=ci&message=passing
 ```
 
 ---
@@ -49,7 +65,7 @@ A production-ready animated badge system using **pure SVG animations** (no CSS, 
 **Animation:** Vertical odometer scroll
 
 ```markdown
-![Version](https://your-worker.workers.dev/badge/version?version=2.1.0&previousVersion=2.0.5)
+![Version](https://badges.datenblick.space/version?version=2.1.0&previousVersion=2.0.5)
 ```
 
 **Query Parameters:**
@@ -60,10 +76,10 @@ A production-ready animated badge system using **pure SVG animations** (no CSS, 
 **Examples:**
 ```bash
 # Version with animation
-/badge/version?version=2.1.0&previousVersion=2.0.5
+/version?version=2.1.0&previousVersion=2.0.5
 
 # Static version (no animation)
-/badge/version?version=1.0.0
+/version?version=1.0.0
 ```
 
 ---
@@ -75,7 +91,7 @@ A production-ready animated badge system using **pure SVG animations** (no CSS, 
 **Animation:** Fill level from bottom to top
 
 ```markdown
-![Coverage](https://your-worker.workers.dev/badge/coverage?coverage=87)
+![Coverage](https://badges.datenblick.space/coverage?coverage=87)
 ```
 
 **Query Parameters:**
@@ -85,13 +101,13 @@ A production-ready animated badge system using **pure SVG animations** (no CSS, 
 **Examples:**
 ```bash
 # High coverage (green)
-/badge/coverage?coverage=87
+/coverage?coverage=87
 
 # Medium coverage (yellow)
-/badge/coverage?coverage=65
+/coverage?coverage=65
 
 # Low coverage (red)
-/badge/coverage?coverage=35
+/coverage?coverage=35
 ```
 
 ---
@@ -103,7 +119,7 @@ A production-ready animated badge system using **pure SVG animations** (no CSS, 
 **Animation:** Shimmer sweep effect
 
 ```markdown
-![License](https://your-worker.workers.dev/badge/license?license=MIT)
+![License](https://badges.datenblick.space/license?license=MIT)
 ```
 
 **Query Parameters:**
@@ -114,11 +130,26 @@ A production-ready animated badge system using **pure SVG animations** (no CSS, 
 **Examples:**
 ```bash
 # MIT license with shimmer
-/badge/license?license=MIT
+/license?license=MIT
 
 # Apache with custom interval
-/badge/license?license=Apache-2.0&shimmerInterval=10
+/license?license=Apache-2.0&shimmerInterval=10
 ```
+
+---
+
+## Quick Start
+
+**Option 1: Use the Hosted Service**
+
+1. Visit the [Interactive Playground](https://badges.datenblick.space)
+2. Customize your badge with live preview
+3. Copy the generated URL
+4. Paste it in your README or documentation
+
+That's it! No installation required.
+
+**Option 2: Self-Host**
 
 ---
 
@@ -147,7 +178,7 @@ npm run build
 npm run dev
 
 # Test badges
-curl "http://localhost:8787/badge/build-status?status=success"
+curl "http://localhost:8787/build-status?status=success"
 ```
 
 ### Deploy to Cloudflare
@@ -193,7 +224,7 @@ Access-Control-Allow-Origin: *
 ### Health Check
 
 ```bash
-curl https://your-worker.workers.dev/health
+curl https://badges.datenblick.space/health
 ```
 
 Response:
@@ -203,10 +234,10 @@ Response:
   "service": "Animated Badge API",
   "version": "1.0.0",
   "endpoints": [
-    "/badge/build-status",
-    "/badge/version",
-    "/badge/coverage",
-    "/badge/license"
+    "/build-status",
+    "/version",
+    "/coverage",
+    "/license"
   ]
 }
 ```

@@ -19,6 +19,8 @@ export interface LicenseBadgeConfig {
 
 export class LicenseBadge extends BaseBadge {
   private licenseConfig: LicenseBadgeConfig;
+  private labelWidth: number;
+  private licenseWidth: number;
 
   constructor(config: LicenseBadgeConfig) {
     // Validate and sanitize license string
@@ -32,19 +34,34 @@ export class LicenseBadge extends BaseBadge {
       shimmerInterval = 7; // Default
     }
 
+    // Calculate widths dynamically
+    const label = config.label || 'license';
+    const formattedLicense = LicenseBadge.formatLicenseStatic(license);
+
+    // Calculate label width (approximately 6.5 pixels per character)
+    const labelWidth = Math.ceil(label.length * 6.5) + 10; // +10 for padding
+    const clampedLabelWidth = Math.max(40, Math.min(80, labelWidth)); // Min 40, Max 80
+
+    // Calculate license width (approximately 6.5 pixels per character, max 25 chars)
+    const licenseWidth = Math.ceil(formattedLicense.length * 6.5) + 14; // +14 for padding
+
+    const totalWidth = clampedLabelWidth + licenseWidth;
+
     const baseConfig: BadgeConfig = {
-      width: 110,
+      width: totalWidth,
       height: 20,
-      viewBox: '0 0 110 20',
+      viewBox: `0 0 ${totalWidth} 20`,
       title: `License: ${license}`,
       backgroundColor: 'transparent',
     };
     super(baseConfig);
     this.licenseConfig = {
       license,
-      label: config.label,
+      label,
       shimmerInterval,
     };
+    this.labelWidth = clampedLabelWidth;
+    this.licenseWidth = licenseWidth;
   }
 
   /**
@@ -66,16 +83,16 @@ export class LicenseBadge extends BaseBadge {
     this.addRect({
       x: 0,
       y: 0,
-      width: 55,
+      width: this.labelWidth,
       height: 20,
       fill: '#555',
     });
 
     // License background
     this.addRect({
-      x: 55,
+      x: this.labelWidth,
       y: 0,
-      width: 55,
+      width: this.licenseWidth,
       height: 20,
       fill: '#007ec6',
     });
@@ -85,12 +102,16 @@ export class LicenseBadge extends BaseBadge {
    * Render license text
    */
   private renderLicenseText(): void {
-    const label = this.licenseConfig.label || 'license';
+    const label = this.licenseConfig.label;
     const licenseText = this.formatLicense(this.licenseConfig.license);
+
+    // Calculate center positions
+    const labelCenterX = this.labelWidth / 2;
+    const licenseCenterX = this.labelWidth + (this.licenseWidth / 2);
 
     // Label text
     this.addText({
-      x: 27.5,
+      x: labelCenterX,
       y: 14,
       text: label,
       fill: '#fff',
@@ -109,38 +130,57 @@ export class LicenseBadge extends BaseBadge {
           <stop offset="100%" stop-color="#fff" stop-opacity="0" />
         </linearGradient>
         <mask id="shimmer-mask">
-          <rect x="55" y="0" width="55" height="20" fill="url(#shimmer-gradient)" opacity="0">
+          <rect x="${this.labelWidth}" y="0" width="${this.licenseWidth}" height="20" fill="url(#shimmer-gradient)" opacity="0">
             <animate attributeName="opacity" values="0;1;0" dur="${shimmerDuration}s" begin="0s;${shimmerInterval}s" repeatCount="indefinite" />
           </rect>
         </mask>
       </defs>`,
-      `<text id="license-text" x="82.5" y="14" fill="#fff" font-size="11" font-family="Verdana, Geneva, sans-serif" text-anchor="middle" mask="url(#shimmer-mask)">${this.escapeXml(licenseText)}</text>`,
+      `<text id="license-text" x="${licenseCenterX}" y="14" fill="#fff" font-size="11" font-family="Verdana, Geneva, sans-serif" text-anchor="middle" mask="url(#shimmer-mask)">${this.escapeXml(licenseText)}</text>`,
     ]);
 
     // Add shimmer sweep animation using animateTransform
+    const shimmerStartX = this.labelWidth;
+    const shimmerEndX = this.labelWidth + this.licenseWidth - 15;
+
     this.addGroup('shimmer-sweep', [
-      `<rect id="shimmer-rect" x="55" y="0" width="15" height="20" fill="url(#shimmer-gradient)" opacity="0">
+      `<rect id="shimmer-rect" x="${shimmerStartX}" y="0" width="15" height="20" fill="url(#shimmer-gradient)" opacity="0">
         <animate attributeName="opacity" values="0;0.6;0" dur="${shimmerDuration}s" begin="0s;${shimmerInterval}s" repeatCount="indefinite" />
-        <animateTransform attributeName="transform" type="translate" from="55,0" to="95,0" dur="${shimmerDuration}s" begin="0s;${shimmerInterval}s" repeatCount="indefinite" additive="sum" />
+        <animateTransform attributeName="transform" type="translate" from="${shimmerStartX},0" to="${shimmerEndX},0" dur="${shimmerDuration}s" begin="0s;${shimmerInterval}s" repeatCount="indefinite" additive="sum" />
       </rect>`,
     ]);
   }
 
   /**
    * Format license text for display
+   * Truncates to maximum of 25 characters
    */
-  private formatLicense(license: string): string {
+  private static formatLicenseStatic(license: string): string {
     // Common license abbreviations
     const licenseMap: Record<string, string> = {
       'MIT': 'MIT',
       'Apache-2.0': 'Apache',
       'GPL-3.0': 'GPL',
       'BSD-3-Clause': 'BSD',
+      'BSD': 'BSD',
       'ISC': 'ISC',
       'MPL-2.0': 'MPL',
     };
 
-    return licenseMap[license] || license.length > 8 ? license.substring(0, 8) : license;
+    // Use mapped value if available, otherwise truncate to 25 chars
+    const mappedLicense = licenseMap[license];
+    if (mappedLicense) {
+      return mappedLicense;
+    }
+
+    return license.length > 25 ? license.substring(0, 25) : license;
+  }
+
+  /**
+   * Format license text for display
+   * Truncates to maximum of 25 characters
+   */
+  private formatLicense(license: string): string {
+    return LicenseBadge.formatLicenseStatic(license);
   }
 
   /**
