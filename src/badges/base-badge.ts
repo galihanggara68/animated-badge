@@ -104,9 +104,13 @@ export class BaseBadge {
 
   /**
    * Add group element for organizing elements
+   * @param id - Group identifier
+   * @param elements - Array of SVG element strings
+   * @param attrs - Additional attributes (e.g., 'clip-path="url(#bar-clip)"')
    */
-  protected addGroup(id: string, elements: string[]): void {
-    this.elements.push(`<g id="${id}">${elements.join('')}</g>`);
+  protected addGroup(id: string, elements: string[], attrs?: string): void {
+    const attrString = attrs ? ` ${attrs}` : '';
+    this.elements.push(`<g id="${id}"${attrString}>${elements.join('')}</g>`);
   }
 
   /**

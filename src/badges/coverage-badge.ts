@@ -1,12 +1,13 @@
 /**
- * Coverage Badge with Fill Level Animation
+ * Coverage Badge with Liquid Fill Animation
  *
  * Trigger Rule: coveragePercentage
- * Animation: Fill Level / Wave effect based on coverage percentage
+ * Animation: Liquid fill with wave effect based on coverage percentage
  *
- * Pure SVG implementation using <animate> on rect height/y
- * Timing: 0.8s - 1.5s duration, fill="freeze", 1x per update
- * Direction: Bottom → Top fill
+ * Pure SVG implementation using <animate> and <animateTransform>
+ * - Rising fill: 1.5s duration, fill="freeze", calcMode="spline" for smooth easing
+ * - Wave motion: indefinite animation for continuous wave effect
+ * Direction: Bottom → Top fill with wave motion
  */
 
 import { BaseBadge, BadgeConfig } from './base-badge';
@@ -53,7 +54,7 @@ export class CoverageBadge extends BaseBadge {
   }
 
   /**
-   * Render badge background and fill bar
+   * Render badge background and liquid fill animation
    */
   private renderBadgeBackground(): void {
     // Label background
@@ -74,27 +75,65 @@ export class CoverageBadge extends BaseBadge {
       fill: '#444',
     });
 
-    // Coverage fill bar (animated)
+    // Calculate fill height and colors
     const fillHeight = Math.max(2, Math.round((this.coverageConfig.coveragePercentage / 100) * 18));
-    const fillColor = this.getCoverageColor();
+    const colors = this.getCoverageColors();
 
-    this.addGroup('coverage-fill', [
-      `<rect id="fill-bar" x="70" y="${20 - fillHeight}" width="50" height="${fillHeight}" fill="${fillColor}" opacity="0.9">
-        <animate attributeName="height" from="0" to="${fillHeight}" dur="1.2s" fill="freeze" calcMode="spline" keySplines="0.4 0 0.2 1" />
-        <animate attributeName="y" from="20" to="${20 - fillHeight}" dur="1.2s" fill="freeze" calcMode="spline" keySplines="0.4 0 0.2 1" />
-      </rect>`,
-    ]);
+    // Add clip path for the bar area
+    this.elements.push(`<defs><clipPath id="bar-clip"><rect x="70" y="3" width="50" height="17" /></clipPath></defs>`);
+
+    // Liquid fill animation with wave effect
+    const waveOffset = this.getWaveOffset(fillHeight);
+
+    // Background wave (lighter, lower opacity)
+    const backWave = `<path fill="${colors.lightColor}" opacity="0.6">
+      <animateTransform attributeName="transform" type="translate" from="0 20" to="0 ${waveOffset.backWave}" dur="1.5s" fill="freeze" calcMode="spline" keySplines="0.4 0 0.2 1"/>
+      <animate attributeName="d" dur="2.5s" repeatCount="indefinite" values="M70 10 Q 82.5 13, 95 10 T 120 10 V 30 H 70 Z; M70 10 Q 82.5 7, 95 10 T 120 10 V 30 H 70 Z; M70 10 Q 82.5 13, 95 10 T 120 10 V 30 H 70 Z" />
+    </path>`;
+
+    // Front wave (darker, higher opacity)
+    const frontWave = `<path fill="${colors.mainColor}" opacity="0.9">
+      <animateTransform attributeName="transform" type="translate" from="0 20" to="0 ${waveOffset.frontWave}" dur="1.5s" fill="freeze" calcMode="spline" keySplines="0.4 0 0.2 1"/>
+      <animate attributeName="d" dur="1.8s" repeatCount="indefinite" values="M70 10 Q 82.5 7, 95 10 T 120 10 V 30 H 70 Z; M70 10 Q 82.5 13, 95 10 T 120 10 V 30 H 70 Z; M70 10 Q 82.5 7, 95 10 T 120 10 V 30 H 70 Z" />
+    </path>`;
+
+    this.addGroup('coverage-fill', [backWave, frontWave], 'clip-path="url(#bar-clip)"');
   }
 
   /**
    * Get color based on coverage percentage
+   * Red (Critical): 0% – 40% (Color: #d73a49)
+   * Yellow (Warning): 41% – 80% (Color: #ffd33d)
+   * Green (Healthy): 81% – 100% (Color: #2cbe4e)
    */
-  private getCoverageColor(): string {
+  private getCoverageColors(): { mainColor: string; lightColor: string } {
     const coverage = this.coverageConfig.coveragePercentage;
-    if (coverage >= 80) return '#2cbe4e'; // Green
-    if (coverage >= 60) return '#dbab09'; // Yellow
-    if (coverage >= 40) return '#df8e32'; // Orange
-    return '#cb2431'; // Red
+
+    if (coverage >= 81) {
+      // Green (Healthy): 81% – 100%
+      return { mainColor: '#2cbe4e', lightColor: '#36d058' };
+    } else if (coverage >= 41) {
+      // Yellow (Warning): 41% – 80%
+      return { mainColor: '#ffd33d', lightColor: '#fff1b8' };
+    } else {
+      // Red (Critical): 0% – 40%
+      return { mainColor: '#d73a49', lightColor: '#ff6b6b' };
+    }
+  }
+
+  /**
+   * Calculate wave offset based on fill height
+   * Ensures the waves rise to the correct level based on coverage
+   */
+  private getWaveOffset(fillHeight: number): { backWave: number; frontWave: number } {
+    const finalY = 20 - fillHeight - 10;
+
+    // Calculate wave positions based on fill level
+    // The waves should be offset to create a layered effect
+    return {
+      backWave: finalY + 2,  // Background wave is slightly higher
+      frontWave: finalY + 3, // Front wave is slightly higher than back
+    };
   }
 
   /**
@@ -126,20 +165,20 @@ export class CoverageBadge extends BaseBadge {
   }
 
   /**
-   * Add fill animation
-   * Uses <animate> on rect height and y attributes
+   * Add liquid fill animation
+   * Uses <animateTransform> for rising effect and <animate> for wave motion
    *
    * Timing Contract:
-   * - Duration: 0.8s - 1.5s (using 1.2s as middle ground)
-   * - Fill: freeze (animation stays at final state)
-   * - Repeat: 1 (one-time animation on update)
-   * - Direction: Bottom → Top (y decreases, height increases)
+   * - Rising Duration: 1.5s with smooth easing (calcMode="spline")
+   * - Fill: freeze (animation stays at final state for rising)
+   * - Wave Motion: indefinite (continuous wave animation)
+   * - Direction: Bottom → Top with layered wave effect
    *
    * The animation is already embedded in renderBadgeBackground()
    * This method is kept for API consistency and future extensions
    */
   private addFillAnimation(): void {
-    // Animation is embedded in the rect element in renderBadgeBackground()
-    // This provides better performance and simpler code structure
+    // Animation is embedded in the wave paths in renderBadgeBackground()
+    // This provides better performance and cleaner code structure
   }
 }
