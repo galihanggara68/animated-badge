@@ -21,15 +21,23 @@ export class VersionBadge extends BaseBadge {
   private versionConfig: VersionBadgeConfig;
 
   constructor(config: VersionBadgeConfig) {
+    // Validate and sanitize version string
+    const version = config.version?.trim() || '0.0.0';
+    const previousVersion = config.previousVersion?.trim();
+
     const baseConfig: BadgeConfig = {
       width: 110,
       height: 20,
       viewBox: '0 0 110 20',
-      title: `Version: ${config.version}`,
+      title: `Version: ${version}`,
       backgroundColor: 'transparent',
     };
     super(baseConfig);
-    this.versionConfig = config;
+    this.versionConfig = {
+      version,
+      previousVersion,
+      label: config.label,
+    };
   }
 
   /**

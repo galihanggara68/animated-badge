@@ -23,15 +23,24 @@ export class BuildStatusBadge extends BaseBadge {
   private statusConfig: BuildStatusBadgeConfig;
 
   constructor(config: BuildStatusBadgeConfig) {
+    // Validate and sanitize status
+    const validStatuses: BuildStatus[] = ['success', 'failed', 'pending', 'running'];
+    const status = config.status && validStatuses.includes(config.status)
+      ? config.status
+      : 'success'; // Default fallback
+
     const baseConfig: BadgeConfig = {
       width: 120,
       height: 20,
       viewBox: '0 0 120 20',
-      title: `Build Status: ${config.status}`,
+      title: `Build Status: ${status}`,
       backgroundColor: 'transparent',
     };
     super(baseConfig);
-    this.statusConfig = config;
+    this.statusConfig = {
+      ...config,
+      status,
+    };
   }
 
   /**

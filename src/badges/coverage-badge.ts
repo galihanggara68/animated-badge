@@ -20,15 +20,25 @@ export class CoverageBadge extends BaseBadge {
   private coverageConfig: CoverageBadgeConfig;
 
   constructor(config: CoverageBadgeConfig) {
+    // Validate and sanitize coverage percentage
+    let coverage = config.coveragePercentage;
+    if (typeof coverage !== 'number' || isNaN(coverage)) {
+      coverage = 0;
+    }
+    coverage = Math.max(0, Math.min(100, coverage)); // Clamp between 0-100
+
     const baseConfig: BadgeConfig = {
       width: 120,
       height: 20,
       viewBox: '0 0 120 20',
-      title: `Coverage: ${config.coveragePercentage}%`,
+      title: `Coverage: ${coverage}%`,
       backgroundColor: 'transparent',
     };
     super(baseConfig);
-    this.coverageConfig = config;
+    this.coverageConfig = {
+      coveragePercentage: coverage,
+      label: config.label,
+    };
   }
 
   /**

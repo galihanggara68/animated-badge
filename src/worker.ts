@@ -3,7 +3,7 @@
  * Serves animated SVG badges with proper headers
  */
 
-import { BuildStatusBadge } from './badges/build-status-badge';
+import { BuildStatusBadge, BuildStatus } from './badges/build-status-badge';
 import { VersionBadge } from './badges/version-badge';
 import { CoverageBadge } from './badges/coverage-badge';
 import { LicenseBadge } from './badges/license-badge';
@@ -43,9 +43,15 @@ export default {
  * Query params: status (success|failed|pending|running), label, message
  */
 async function handleBuildStatusBadge(url: URL): Promise<Response> {
-  const status = url.searchParams.get('status') as 'success' | 'failed' | 'pending' | 'running' || 'success';
+  const statusParam = url.searchParams.get('status');
   const label = url.searchParams.get('label') || undefined;
   const message = url.searchParams.get('message') || undefined;
+
+  // Validate status against allowed values
+  const validStatuses: BuildStatus[] = ['success', 'failed', 'pending', 'running'];
+  const status = validStatuses.includes(statusParam as BuildStatus)
+    ? (statusParam as BuildStatus)
+    : 'success';
 
   const badge = new BuildStatusBadge({ status, label, message });
   const svg = badge.generate();
@@ -58,8 +64,8 @@ async function handleBuildStatusBadge(url: URL): Promise<Response> {
  * Query params: version, previousVersion, label
  */
 async function handleVersionBadge(url: URL): Promise<Response> {
-  const version = url.searchParams.get('version') || '0.0.0';
-  const previousVersion = url.searchParams.get('previousVersion') || undefined;
+  const version = url.searchParams.get('version')?.trim() || '0.0.0';
+  const previousVersion = url.searchParams.get('previousVersion')?.trim() || undefined;
   const label = url.searchParams.get('label') || undefined;
 
   const badge = new VersionBadge({ version, previousVersion, label });
@@ -73,7 +79,17 @@ async function handleVersionBadge(url: URL): Promise<Response> {
  * Query params: coverage (number), label
  */
 async function handleCoverageBadge(url: URL): Promise<Response> {
-  const coverage = parseFloat(url.searchParams.get('coverage') || '0');
+  const coverageParam = url.searchParams.get('coverage');
+  let coverage = 0;
+
+  // Parse and validate coverage percentage
+  if (coverageParam) {
+    const parsed = parseFloat(coverageParam);
+    if (!isNaN(parsed)) {
+      coverage = Math.max(0, Math.min(100, parsed));
+    }
+  }
+
   const label = url.searchParams.get('label') || undefined;
 
   const badge = new CoverageBadge({ coveragePercentage: coverage, label });
@@ -87,11 +103,18 @@ async function handleCoverageBadge(url: URL): Promise<Response> {
  * Query params: license, label, shimmerInterval
  */
 async function handleLicenseBadge(url: URL): Promise<Response> {
-  const license = url.searchParams.get('license') || 'MIT';
+  const license = url.searchParams.get('license')?.trim() || 'MIT';
   const label = url.searchParams.get('label') || undefined;
-  const shimmerInterval = url.searchParams.get('shimmerInterval')
-    ? parseInt(url.searchParams.get('shimmerInterval')!)
-    : undefined;
+
+  // Validate and parse shimmer interval (must be 5-10)
+  let shimmerInterval: number | undefined = undefined;
+  const shimmerParam = url.searchParams.get('shimmerInterval');
+  if (shimmerParam) {
+    const parsed = parseInt(shimmerParam);
+    if (!isNaN(parsed)) {
+      shimmerInterval = Math.max(5, Math.min(10, parsed));
+    }
+  }
 
   const badge = new LicenseBadge({ license, label, shimmerInterval });
   const svg = badge.generate();

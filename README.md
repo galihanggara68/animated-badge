@@ -4,7 +4,7 @@ A production-ready animated badge system using **pure SVG animations** (no CSS, 
 
 ## Features
 
-- **Pure SVG Animations** - Uses only SMIL elements (`<animate>`, `<animateTransform>`, `<animateMotion>`)
+- **Pure SVG Animations** - Uses only SMIL elements
 - **GitHub Compatible** - Preserves viewBox and geometry, works on README files
 - **Lightweight** - All badges under 256 KB
 - **Data-Driven** - Animations triggered by actual data changes
@@ -122,69 +122,18 @@ A production-ready animated badge system using **pure SVG animations** (no CSS, 
 
 ---
 
-## Technical Specifications
-
-### Hard Constraints
-
-**Format:** Animated SVG only
-**Animation:** Pure SVG SMIL elements only
-**No CSS:** No `<style>`, no CSS animations
-**No JavaScript:** No `<script>` tags
-**File Size:** ≤ 256 KB
-**Height:** 20-28px
-**Looping:** `repeatCount="indefinite"` for looping animations
-**MIME Type:** `image/svg+xml`
-
-### Allowed Animation Tags
-
-| Tag | Usage |
-|-----|-------|
-| `<animate>` | Attribute interpolation (opacity, fill, width, x, y) |
-| `<animateTransform>` | translate / scale / rotate transformations |
-| `<animateMotion>` | Path-based motion |
-| `<set>` | Discrete state changes |
-
-### Animation Timing Contracts
-
-| Animation | Duration | Repeat | Fill | Direction |
-|-----------|----------|--------|------|-----------|
-| Pulse | 1.2-1.8s | indefinite | default | N/A |
-| Scroll | 0.6-1.2s | 1 | freeze | Vertical |
-| Fill | 0.8-1.5s | 1 | freeze | Bottom→Top |
-| Shimmer | 1.0-1.6s | indefinite | default | Left→Right |
-
----
-
-## Architecture
-
-```
-src/
-├── badges/
-│   ├── base-badge.ts          # Base badge generator
-│   ├── build-status-badge.ts  # Build status with pulse
-│   ├── version-badge.ts       # Version with scroll
-│   ├── coverage-badge.ts      # Coverage with fill
-│   ├── license-badge.ts       # License with shimmer
-│   └── index.ts               # Exports
-├── examples/
-│   └── test-badges.ts         # Example generator
-└── worker.ts                  # Cloudflare Worker API
-```
-
----
-
 ## Installation
 
 ```bash
 # Clone repository
-git clone <repo-url>
+git clone https://github.com/galihanggara68/animated-badge
 cd animated-badge
 
 # Install dependencies
 npm install
 
 # Build
-npm run build:worker
+npm run build
 ```
 
 ---
@@ -195,7 +144,7 @@ npm run build:worker
 
 ```bash
 # Start local development server
-npm run worker:dev
+npm run dev
 
 # Test badges
 curl "http://localhost:8787/badge/build-status?status=success"
@@ -208,10 +157,10 @@ curl "http://localhost:8787/badge/build-status?status=success"
 npx wrangler login
 
 # Deploy to production
-npm run worker:deploy
+npm run deploy
 
 # Deploy to development environment
-npm run worker:deploy:dev
+npm run deploy:dev
 ```
 
 ### Configuration
@@ -297,22 +246,6 @@ npm run test:badges
 ```
 
 This creates SVG files in `./examples/` directory for visual inspection.
-
----
-
-## Requirements Compliance
-
-This implementation strictly follows the requirements specified in `REQUIREMENTS.md`:
-
-Pure SVG animations (SMIL only)
-No CSS or JavaScript
-Preserves viewBox and geometry
-File size ≤ 256 KB
-Height 20-28px
-Deterministic animation triggers
-Proper timing contracts
-Cloudflare Workers deployment
-Proper cache headers
 
 ---
 

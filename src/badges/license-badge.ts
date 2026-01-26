@@ -21,15 +21,30 @@ export class LicenseBadge extends BaseBadge {
   private licenseConfig: LicenseBadgeConfig;
 
   constructor(config: LicenseBadgeConfig) {
+    // Validate and sanitize license string
+    const license = config.license?.trim() || 'MIT';
+
+    // Validate shimmer interval (must be between 5-10 seconds)
+    let shimmerInterval = config.shimmerInterval;
+    if (shimmerInterval !== undefined) {
+      shimmerInterval = Math.max(5, Math.min(10, shimmerInterval));
+    } else {
+      shimmerInterval = 7; // Default
+    }
+
     const baseConfig: BadgeConfig = {
       width: 110,
       height: 20,
       viewBox: '0 0 110 20',
-      title: `License: ${config.license}`,
+      title: `License: ${license}`,
       backgroundColor: 'transparent',
     };
     super(baseConfig);
-    this.licenseConfig = config;
+    this.licenseConfig = {
+      license,
+      label: config.label,
+      shimmerInterval,
+    };
   }
 
   /**
