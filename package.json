@@ -1,0 +1,27 @@
+{
+  "name": "animated-badge",
+  "private": true,
+  "version": "1.0.0",
+  "description": "Animated SVG Badge System - Pure SVG animations served via Cloudflare Workers",
+  "type": "module",
+  "scripts": {
+    "build": "tsc",
+    "dev": "wrangler dev",
+    "deploy": "wrangler deploy",
+    "deploy:dev": "wrangler deploy --env dev",
+    "test:badges": "node --loader ts-node/esm src/examples/test-badges.ts"
+  },
+  "keywords": [
+    "svg",
+    "badges",
+    "animation",
+    "cloudflare",
+    "workers"
+  ],
+  "devDependencies": {
+    "@cloudflare/workers-types": "^4.0.0",
+    "@types/node": "^25.0.10",
+    "typescript": "~5.9.3",
+    "wrangler": "^4.60.0"
+  }
+}
