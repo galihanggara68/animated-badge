@@ -1,11 +1,10 @@
 /**
  * License Badge with Shimmer/Glint Animation
  *
- * Trigger Rule: time-based (every 5-10s)
- * Animation: Shimmer / Glint sweep effect
+ * Animation: Continuous shimmer sweep effect across the entire badge
  *
- * Pure SVG implementation using <animateTransform> on gradient mask
- * Timing: 1.0s - 1.6s duration, every 5-10s interval, indefinite repeat
+ * Pure SVG implementation using <animateTransform> on a gradient rectangle
+ * Timing: 3s duration, continuous repeat (indefinite)
  * Direction: Left → Right
  */
 
@@ -14,7 +13,6 @@ import { BaseBadge, BadgeConfig, AnimationTiming } from './base-badge';
 export interface LicenseBadgeConfig {
   license: string;
   label?: string;
-  shimmerInterval?: number; // Seconds between shimmer animations (default: 7s)
 }
 
 export class LicenseBadge extends BaseBadge {
@@ -25,14 +23,6 @@ export class LicenseBadge extends BaseBadge {
   constructor(config: LicenseBadgeConfig) {
     // Validate and sanitize license string
     const license = config.license?.trim() || 'MIT';
-
-    // Validate shimmer interval (must be between 5-10 seconds)
-    let shimmerInterval = config.shimmerInterval;
-    if (shimmerInterval !== undefined) {
-      shimmerInterval = Math.max(5, Math.min(10, shimmerInterval));
-    } else {
-      shimmerInterval = 7; // Default
-    }
 
     // Calculate widths dynamically
     const label = config.label || 'license';
@@ -58,7 +48,6 @@ export class LicenseBadge extends BaseBadge {
     this.licenseConfig = {
       license,
       label,
-      shimmerInterval,
     };
     this.labelWidth = clampedLabelWidth;
     this.licenseWidth = licenseWidth;
@@ -118,36 +107,14 @@ export class LicenseBadge extends BaseBadge {
       textAnchor: 'middle',
     });
 
-    // License text (with gradient definition for shimmer)
-    const shimmerInterval = this.licenseConfig.shimmerInterval || 7;
-    const shimmerDuration = 1.3;
-
-    this.addGroup('license-container', [
-      `<defs>
-        <linearGradient id="shimmer-gradient" x1="0%" y1="0%" x2="100%" y2="0%">
-          <stop offset="0%" stop-color="#fff" stop-opacity="0" />
-          <stop offset="50%" stop-color="#fff" stop-opacity=".8" />
-          <stop offset="100%" stop-color="#fff" stop-opacity="0" />
-        </linearGradient>
-        <mask id="shimmer-mask">
-          <rect x="${this.labelWidth}" y="0" width="${this.licenseWidth}" height="20" fill="url(#shimmer-gradient)" opacity="0">
-            <animate attributeName="opacity" values="0;1;0" dur="${shimmerDuration}s" begin="0s;${shimmerInterval}s" repeatCount="indefinite" />
-          </rect>
-        </mask>
-      </defs>`,
-      `<text id="license-text" x="${licenseCenterX}" y="14" fill="#fff" font-size="11" font-family="Verdana, Geneva, sans-serif" text-anchor="middle" mask="url(#shimmer-mask)">${this.escapeXml(licenseText)}</text>`,
-    ]);
-
-    // Add shimmer sweep animation using animateTransform
-    const shimmerStartX = this.labelWidth;
-    const shimmerEndX = this.labelWidth + this.licenseWidth - 15;
-
-    this.addGroup('shimmer-sweep', [
-      `<rect id="shimmer-rect" x="${shimmerStartX}" y="0" width="15" height="20" fill="url(#shimmer-gradient)" opacity="0">
-        <animate attributeName="opacity" values="0;0.6;0" dur="${shimmerDuration}s" begin="0s;${shimmerInterval}s" repeatCount="indefinite" />
-        <animateTransform attributeName="transform" type="translate" from="${shimmerStartX},0" to="${shimmerEndX},0" dur="${shimmerDuration}s" begin="0s;${shimmerInterval}s" repeatCount="indefinite" additive="sum" />
-      </rect>`,
-    ]);
+    // License text
+    this.addText({
+      x: licenseCenterX,
+      y: 14,
+      text: licenseText,
+      fill: '#fff',
+      textAnchor: 'middle',
+    });
   }
 
   /**
@@ -185,23 +152,38 @@ export class LicenseBadge extends BaseBadge {
 
   /**
    * Add shimmer animation
-   * Uses <animateTransform> for left-to-right sweep
-   * Combines with <animate> on opacity for fade effect
+   * Uses <animateTransform> for left-to-right sweep across the entire badge
+   * Simpler approach using a sweeping gradient rectangle
    *
    * Timing Contract:
-   * - Duration: 1.0s - 1.6s (using 1.3s as middle ground)
-   * - Interval: Every 5-10s (default: 7s)
+   * - Duration: 3s (continuous animation)
    * - Repeat: indefinite
    * - Direction: Left → Right
-   *
-   * Animation is embedded in renderLicenseText() for better performance
-   * This method provides API consistency and future extensibility
    */
   private addShimmerAnimation(): void {
-    // Animation is embedded in renderLicenseText()
-    // Uses a combination of:
-    // 1. <animate> on opacity for fade in/out
-    // 2. <animateTransform> for horizontal sweep movement
-    // 3. Time-based triggers using begin="0s;7s" pattern
+    const shimmerWidth = 30;
+    const shimmerDuration = 3;
+    const totalWidth = this.labelWidth + this.licenseWidth;
+
+    // Add shimmer gradient definition and animation
+    this.addGroup('shimmer-container', [
+      `<defs>
+        <linearGradient id="shimmer-gradient" x1="0%" y1="10%" x2="100%" y2="0%">
+          <stop offset="0%" stop-color="#fff" stop-opacity="0"/>
+          <stop offset="50%" stop-color="#fff" stop-opacity=".4"/>
+          <stop offset="100%" stop-color="#fff" stop-opacity="0"/>
+        </linearGradient>
+      </defs>`,
+      `<rect x="0" y="0" width="${shimmerWidth}" height="20" fill="url(#shimmer-gradient)">
+        <animateTransform
+          attributeName="transform"
+          type="translate"
+          from="-${shimmerWidth},0"
+          to="${totalWidth},0"
+          dur="${shimmerDuration}s"
+          begin="0s"
+          repeatCount="indefinite"/>
+      </rect>`,
+    ]);
   }
 }

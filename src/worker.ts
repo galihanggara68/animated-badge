@@ -103,23 +103,13 @@ async function handleCoverageBadge(url: URL): Promise<Response> {
 
 /**
  * Handle license badge requests
- * Query params: license, label, shimmerInterval
+ * Query params: license, label
  */
 async function handleLicenseBadge(url: URL): Promise<Response> {
   const license = url.searchParams.get('license')?.trim() || 'MIT';
   const label = url.searchParams.get('label') || undefined;
 
-  // Validate and parse shimmer interval (must be 5-10)
-  let shimmerInterval: number | undefined = undefined;
-  const shimmerParam = url.searchParams.get('shimmerInterval');
-  if (shimmerParam) {
-    const parsed = parseInt(shimmerParam);
-    if (!isNaN(parsed)) {
-      shimmerInterval = Math.max(5, Math.min(10, parsed));
-    }
-  }
-
-  const badge = new LicenseBadge({ license, label, shimmerInterval });
+  const badge = new LicenseBadge({ license, label });
   const svg = badge.generate();
 
   return createSvgResponse(svg);
