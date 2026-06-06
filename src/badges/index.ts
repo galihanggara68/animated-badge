@@ -8,3 +8,5 @@ export { BuildStatusBadge, BuildStatusBadgeConfig, BuildStatus } from './build-s
 export { VersionBadge, VersionBadgeConfig } from './version-badge';
 export { CoverageBadge, CoverageBadgeConfig } from './coverage-badge';
 export { LicenseBadge, LicenseBadgeConfig } from './license-badge';
+export { GitHubStarsBadge, GithubStarsBadgeConfig } from './github-stars-badge';
+export { GithubIssuesBadge, GithubIssuesBadgeConfig } from './github-issues-badge';

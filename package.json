@@ -6,6 +6,8 @@
   "type": "module",
   "scripts": {
     "build": "tsc",
+    "typecheck": "tsc --noEmit",
+    "lint": "tsc --noEmit",
     "dev": "wrangler dev",
     "deploy": "wrangler deploy",
     "deploy:dev": "wrangler deploy --env dev",

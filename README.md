@@ -35,17 +35,29 @@ Experiment with different parameters and see the badges update instantly!
 
 **Animation:** Pulse effect on success status
 
+**Static Usage:**
 ```markdown
 ![Build Status](https://badges.datenblick.space/build-status?status=success)
 ```
 
+**Dynamic Usage (GitHub Actions):**
+```markdown
+![Build Status](https://badges.datenblick.space/build-status?owner=microsoft&repo=typescript)
+```
+
 **Query Parameters:**
-- `status` (required): `success` | `failed` | `pending` | `running`
+- `owner` (optional): GitHub repository owner
+- `repo` (optional): GitHub repository name
+- `branch` (optional): Specific branch to check
+- `status` (fallback): `success` | `failed` | `pending` | `running`
 - `label` (optional): Custom label text
 - `message` (optional): Custom status message
 
 **Examples:**
 ```bash
+# Dynamic status from GitHub
+/build-status?owner=microsoft&repo=typescript
+
 # Success build (with pulse)
 /build-status?status=success
 

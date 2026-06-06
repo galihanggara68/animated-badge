@@ -65,6 +65,23 @@ export interface LicenseBadgeConfig {
 }
 
 /**
+ * GitHub stars badge configuration
+ */
+export interface GithubStarsBadgeConfig {
+  stars: number | string;
+  label?: string;
+}
+
+/**
+ * GitHub issues badge configuration
+ */
+export interface GithubIssuesBadgeConfig {
+  open: number;
+  closed: number;
+  label?: string;
+}
+
+/**
  * Cloudflare Worker environment interface
  */
 export interface Env {
@@ -79,7 +96,9 @@ export type BadgeConfig =
   | BuildStatusBadgeConfig
   | VersionBadgeConfig
   | CoverageBadgeConfig
-  | LicenseBadgeConfig;
+  | LicenseBadgeConfig
+  | GithubStarsBadgeConfig
+  | GithubIssuesBadgeConfig;
 
 /**
  * Badge type enum
@@ -89,6 +108,8 @@ export enum BadgeType {
   VERSION = 'version',
   COVERAGE = 'coverage',
   LICENSE = 'license',
+  GITHUB_STARS = 'github-stars',
+  GITHUB_ISSUES = 'github-issues',
 }
 
 /**

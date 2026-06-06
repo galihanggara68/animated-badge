@@ -62,7 +62,7 @@ export const rootPageHtml = `<!DOCTYPE html>
     <!-- Build Status Badge -->
     <section class="mb-12 p-6 bg-gray-50 dark:bg-gray-900 border-l-4 border-gray-500 rounded-lg">
       <h2 class="text-2xl font-normal mb-3 text-gray-900 dark:text-gray-100">Build Status Badge</h2>
-      <p class="mb-4 text-gray-600 dark:text-gray-400">Generate animated badges for build statuses with a pulse animation on success.</p>
+      <p class="mb-4 text-gray-600 dark:text-gray-400">Generate animated badges for build statuses. Supports static status or dynamic fetching from GitHub Actions.</p>
 
       <h3 class="text-sm font-medium text-gray-700 dark:text-gray-300">Endpoint:</h3>
       <code class="inline-block bg-white dark:bg-gray-950 px-2 py-1 rounded text-sm border border-gray-300 dark:border-gray-700 font-mono">/build-status</code>
@@ -76,8 +76,19 @@ export const rootPageHtml = `<!DOCTYPE html>
 
         <!-- Controls -->
         <div class="space-y-4">
-          <div>
-            <label class="block text-sm font-medium mb-2 text-gray-700 dark:text-gray-300">Status:</label>
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div>
+              <label class="block text-sm font-medium mb-2 text-gray-700 dark:text-gray-300">GitHub Owner (optional):</label>
+              <input type="text" x-model="buildStatus.owner" placeholder="e.g. microsoft" class="w-full px-3 py-2.5 border border-gray-300 dark:border-gray-700 rounded-lg bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100 text-sm focus:ring-2 focus:ring-gray-400 focus:border-transparent" />
+            </div>
+            <div>
+              <label class="block text-sm font-medium mb-2 text-gray-700 dark:text-gray-300">GitHub Repo (optional):</label>
+              <input type="text" x-model="buildStatus.repo" placeholder="e.g. typescript" class="w-full px-3 py-2.5 border border-gray-300 dark:border-gray-700 rounded-lg bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100 text-sm focus:ring-2 focus:ring-gray-400 focus:border-transparent" />
+            </div>
+          </div>
+
+          <div x-show="!buildStatus.owner || !buildStatus.repo">
+            <label class="block text-sm font-medium mb-2 text-gray-700 dark:text-gray-300">Static Status:</label>
             <select x-model="buildStatus.status" class="w-full px-3 py-2.5 border border-gray-300 dark:border-gray-700 rounded-lg bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100 text-sm focus:ring-2 focus:ring-gray-400 focus:border-transparent">
               <option value="success">Success</option>
               <option value="failed">Failed</option>
@@ -91,8 +102,8 @@ export const rootPageHtml = `<!DOCTYPE html>
             <input type="text" x-model="buildStatus.label" placeholder="build" class="w-full px-3 py-2.5 border border-gray-300 dark:border-gray-700 rounded-lg bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100 text-sm focus:ring-2 focus:ring-gray-400 focus:border-transparent" />
           </div>
 
-          <div>
-            <label class="block text-sm font-medium mb-2 text-gray-700 dark:text-gray-300">Message:</label>
+          <div x-show="!buildStatus.owner || !buildStatus.repo">
+            <label class="block text-sm font-medium mb-2 text-gray-700 dark:text-gray-300">Message Override:</label>
             <input type="text" x-model="buildStatus.message" placeholder="auto" class="w-full px-3 py-2.5 border border-gray-300 dark:border-gray-700 rounded-lg bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100 text-sm focus:ring-2 focus:ring-gray-400 focus:border-transparent" />
           </div>
 
@@ -101,8 +112,7 @@ export const rootPageHtml = `<!DOCTYPE html>
             <div class="flex flex-wrap gap-2">
               <button @click="setBuildStatusPreset('success')" class="px-4 py-2 bg-gray-100 dark:bg-gray-800 border border-gray-300 dark:border-gray-700 rounded-lg text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-500 hover:text-white hover:border-gray-500 transition-all duration-200">✓ Passing</button>
               <button @click="setBuildStatusPreset('failed')" class="px-4 py-2 bg-gray-100 dark:bg-gray-800 border border-gray-300 dark:border-gray-700 rounded-lg text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-500 hover:text-white hover:border-gray-500 transition-all duration-200">✗ Failing</button>
-              <button @click="setBuildStatusPreset('pending')" class="px-4 py-2 bg-gray-100 dark:bg-gray-800 border border-gray-300 dark:border-gray-700 rounded-lg text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-500 hover:text-white hover:border-gray-500 transition-all duration-200">⟳ Pending</button>
-              <button @click="setBuildStatusPreset('running')" class="px-4 py-2 bg-gray-100 dark:bg-gray-800 border border-gray-300 dark:border-gray-700 rounded-lg text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-500 hover:text-white hover:border-gray-500 transition-all duration-200">▶ Running</button>
+              <button @click="setBuildStatusGithubPreset('microsoft', 'typescript')" class="px-4 py-2 bg-blue-100 dark:bg-blue-900 border border-blue-300 dark:border-blue-700 rounded-lg text-sm text-blue-700 dark:text-blue-300 hover:bg-blue-500 hover:text-white hover:border-blue-500 transition-all duration-200">GitHub: TypeScript</button>
             </div>
           </div>
         </div>
@@ -271,6 +281,102 @@ export const rootPageHtml = `<!DOCTYPE html>
       </div>
     </section>
 
+    <!-- GitHub Stars Badge -->
+    <section class="mb-12 p-6 bg-gray-50 dark:bg-gray-900 border-l-4 border-gray-500 rounded-lg">
+      <h2 class="text-2xl font-normal mb-3 text-gray-900 dark:text-gray-100">GitHub Stars Badge</h2>
+      <p class="mb-4 text-gray-600 dark:text-gray-400">Display GitHub star counts with a pulsing animation on load.</p>
+
+      <h3 class="text-sm font-medium text-gray-700 dark:text-gray-300">Endpoint:</h3>
+      <code class="inline-block bg-white dark:bg-gray-950 px-2 py-1 rounded text-sm border border-gray-300 dark:border-gray-700 font-mono">/github/stars</code>
+
+      <h3 class="text-lg font-medium mt-8 mb-4 text-gray-900 dark:text-gray-100">Interactive Preview:</h3>
+      <div class="mt-5 border border-gray-300 dark:border-gray-700 rounded-lg p-5 bg-white dark:bg-gray-950">
+        <!-- Badge Preview -->
+        <div class="flex justify-center items-center p-8 bg-gray-100 dark:bg-gray-800 rounded-lg mb-5 min-h-20">
+          <img :src="githubStarsUrl()" alt="GitHub Stars Badge" class="max-w-full h-auto" />
+        </div>
+
+        <!-- Controls -->
+        <div class="space-y-4">
+          <div>
+            <label class="block text-sm font-medium mb-2 text-gray-700 dark:text-gray-300">Stars:</label>
+            <input type="text" x-model="githubStars.stars" class="w-full px-3 py-2.5 border border-gray-300 dark:border-gray-700 rounded-lg bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100 text-sm focus:ring-2 focus:ring-gray-400 focus:border-transparent" />
+          </div>
+
+          <div>
+            <label class="block text-sm font-medium mb-2 text-gray-700 dark:text-gray-300">Label:</label>
+            <input type="text" x-model="githubStars.label" placeholder="stars" class="w-full px-3 py-2.5 border border-gray-300 dark:border-gray-700 rounded-lg bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100 text-sm focus:ring-2 focus:ring-gray-400 focus:border-transparent" />
+          </div>
+
+          <div>
+            <label class="block text-sm font-medium mb-3 text-gray-700 dark:text-gray-300">Quick Presets:</label>
+            <div class="flex flex-wrap gap-2">
+              <button @click="setGithubStarsPreset('1.2k')" class="px-4 py-2 bg-gray-100 dark:bg-gray-800 border border-gray-300 dark:border-gray-700 rounded-lg text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-500 hover:text-white hover:border-gray-500 transition-all duration-200">1.2k</button>
+              <button @click="setGithubStarsPreset('500')" class="px-4 py-2 bg-gray-100 dark:bg-gray-800 border border-gray-300 dark:border-gray-700 rounded-lg text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-500 hover:text-white hover:border-gray-500 transition-all duration-200">500</button>
+              <button @click="setGithubStarsPreset('10k+')" class="px-4 py-2 bg-gray-100 dark:bg-gray-800 border border-gray-300 dark:border-gray-700 rounded-lg text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-500 hover:text-white hover:border-gray-500 transition-all duration-200">10k+</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- URL Output -->
+        <div class="mt-6 pt-6 border-t border-gray-300 dark:border-gray-700">
+          <label class="block text-sm font-medium mb-2 text-gray-700 dark:text-gray-300">URL:</label>
+          <code x-text="githubStarsUrl()" class="block px-4 py-3 bg-gray-100 dark:bg-gray-800 border border-gray-300 dark:border-gray-700 rounded-lg text-sm font-mono break-all text-gray-700 dark:text-gray-300"></code>
+        </div>
+      </div>
+    </section>
+
+    <!-- GitHub Issues Badge -->
+    <section class="mb-12 p-6 bg-gray-50 dark:bg-gray-900 border-l-4 border-gray-500 rounded-lg">
+      <h2 class="text-2xl font-normal mb-3 text-gray-900 dark:text-gray-100">GitHub Issues Badge</h2>
+      <p class="mb-4 text-gray-600 dark:text-gray-400">Display open and closed issue counts with a slide-in animation on load.</p>
+
+      <h3 class="text-sm font-medium text-gray-700 dark:text-gray-300">Endpoint:</h3>
+      <code class="inline-block bg-white dark:bg-gray-950 px-2 py-1 rounded text-sm border border-gray-300 dark:border-gray-700 font-mono">/github/issues</code>
+
+      <h3 class="text-lg font-medium mt-8 mb-4 text-gray-900 dark:text-gray-100">Interactive Preview:</h3>
+      <div class="mt-5 border border-gray-300 dark:border-gray-700 rounded-lg p-5 bg-white dark:bg-gray-950">
+        <!-- Badge Preview -->
+        <div class="flex justify-center items-center p-8 bg-gray-100 dark:bg-gray-800 rounded-lg mb-5 min-h-20">
+          <img :src="githubIssuesUrl()" alt="GitHub Issues Badge" class="max-w-full h-auto" />
+        </div>
+
+        <!-- Controls -->
+        <div class="space-y-4">
+          <div class="grid grid-cols-2 gap-4">
+            <div>
+              <label class="block text-sm font-medium mb-2 text-gray-700 dark:text-gray-300">Open:</label>
+              <input type="number" x-model="githubIssues.open" min="0" class="w-full px-3 py-2.5 border border-gray-300 dark:border-gray-700 rounded-lg bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100 text-sm focus:ring-2 focus:ring-gray-400 focus:border-transparent" />
+            </div>
+            <div>
+              <label class="block text-sm font-medium mb-2 text-gray-700 dark:text-gray-300">Closed:</label>
+              <input type="number" x-model="githubIssues.closed" min="0" class="w-full px-3 py-2.5 border border-gray-300 dark:border-gray-700 rounded-lg bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100 text-sm focus:ring-2 focus:ring-gray-400 focus:border-transparent" />
+            </div>
+          </div>
+
+          <div>
+            <label class="block text-sm font-medium mb-2 text-gray-700 dark:text-gray-300">Label:</label>
+            <input type="text" x-model="githubIssues.label" placeholder="issues" class="w-full px-3 py-2.5 border border-gray-300 dark:border-gray-700 rounded-lg bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100 text-sm focus:ring-2 focus:ring-gray-400 focus:border-transparent" />
+          </div>
+
+          <div>
+            <label class="block text-sm font-medium mb-3 text-gray-700 dark:text-gray-300">Quick Presets:</label>
+            <div class="flex flex-wrap gap-2">
+              <button @click="setGithubIssuesPreset(5, 10)" class="px-4 py-2 bg-gray-100 dark:bg-gray-800 border border-gray-300 dark:border-gray-700 rounded-lg text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-500 hover:text-white hover:border-gray-500 transition-all duration-200">Few</button>
+              <button @click="setGithubIssuesPreset(42, 156)" class="px-4 py-2 bg-gray-100 dark:bg-gray-800 border border-gray-300 dark:border-gray-700 rounded-lg text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-500 hover:text-white hover:border-gray-500 transition-all duration-200">Many</button>
+              <button @click="setGithubIssuesPreset(0, 500)" class="px-4 py-2 bg-gray-100 dark:bg-gray-800 border border-gray-300 dark:border-gray-700 rounded-lg text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-500 hover:text-white hover:border-gray-500 transition-all duration-200">All Closed</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- URL Output -->
+        <div class="mt-6 pt-6 border-t border-gray-300 dark:border-gray-700">
+          <label class="block text-sm font-medium mb-2 text-gray-700 dark:text-gray-300">URL:</label>
+          <code x-text="githubIssuesUrl()" class="block px-4 py-3 bg-gray-100 dark:bg-gray-800 border border-gray-300 dark:border-gray-700 rounded-lg text-sm font-mono break-all text-gray-700 dark:text-gray-300"></code>
+        </div>
+      </div>
+    </section>
+
     <!-- Usage Section -->
     <section class="mb-12 p-6 bg-gray-50 dark:bg-gray-900 border-l-4 border-gray-500 rounded-lg">
       <h2 class="text-2xl font-normal mb-3 text-gray-900 dark:text-gray-100">Usage</h2>
@@ -301,7 +407,10 @@ export const rootPageHtml = `<!DOCTYPE html>
         buildStatus: {
           status: 'success',
           label: '',
-          message: ''
+          message: '',
+          owner: '',
+          repo: '',
+          branch: ''
         },
 
         // Version state
@@ -324,19 +433,47 @@ export const rootPageHtml = `<!DOCTYPE html>
           shimmerInterval: '5'
         },
 
+        // GitHub Stars state
+        githubStars: {
+          stars: '1.2k',
+          label: ''
+        },
+
+        // GitHub Issues state
+        githubIssues: {
+          open: 5,
+          closed: 10,
+          label: ''
+        },
+
         // Build Status functions
         buildStatusUrl() {
           const params = new URLSearchParams();
-          params.append('status', this.buildStatus.status);
+          if (this.buildStatus.owner && this.buildStatus.repo) {
+            params.append('owner', this.buildStatus.owner);
+            params.append('repo', this.buildStatus.repo);
+            if (this.buildStatus.branch) params.append('branch', this.buildStatus.branch);
+          } else {
+            params.append('status', this.buildStatus.status);
+            if (this.buildStatus.message) params.append('message', this.buildStatus.message);
+          }
+          
           if (this.buildStatus.label) params.append('label', this.buildStatus.label);
-          if (this.buildStatus.message) params.append('message', this.buildStatus.message);
           return '/build-status?' + params.toString();
         },
 
         setBuildStatusPreset(status) {
           this.buildStatus.status = status;
+          this.buildStatus.owner = '';
+          this.buildStatus.repo = '';
           this.buildStatus.label = '';
           this.buildStatus.message = '';
+        },
+
+        setBuildStatusGithubPreset(owner, repo) {
+          this.buildStatus.owner = owner;
+          this.buildStatus.repo = repo;
+          this.buildStatus.label = '';
         },
 
         // Version functions
@@ -380,6 +517,34 @@ export const rootPageHtml = `<!DOCTYPE html>
           this.license.license = license;
           this.license.label = '';
           this.license.shimmerInterval = shimmerInterval.toString();
+        },
+
+        // GitHub Stars functions
+        githubStarsUrl() {
+          const params = new URLSearchParams();
+          params.append('stars', this.githubStars.stars);
+          if (this.githubStars.label) params.append('label', this.githubStars.label);
+          return '/github/stars?' + params.toString();
+        },
+
+        setGithubStarsPreset(stars) {
+          this.githubStars.stars = stars;
+          this.githubStars.label = '';
+        },
+
+        // GitHub Issues functions
+        githubIssuesUrl() {
+          const params = new URLSearchParams();
+          params.append('open', this.githubIssues.open);
+          params.append('closed', this.githubIssues.closed);
+          if (this.githubIssues.label) params.append('label', this.githubIssues.label);
+          return '/github/issues?' + params.toString();
+        },
+
+        setGithubIssuesPreset(open, closed) {
+          this.githubIssues.open = open;
+          this.githubIssues.closed = closed;
+          this.githubIssues.label = '';
         }
       }
     }
