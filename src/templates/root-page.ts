@@ -142,7 +142,18 @@ export const rootPageHtml = `<!DOCTYPE html>
 
         <!-- Controls -->
         <div class="space-y-4">
-          <div>
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div>
+              <label class="block text-sm font-medium mb-2 text-gray-700 dark:text-gray-300">GitHub Owner (optional):</label>
+              <input type="text" x-model.debounce.500ms="version.owner" placeholder="e.g. microsoft" class="w-full px-3 py-2.5 border border-gray-300 dark:border-gray-700 rounded-lg bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100 text-sm focus:ring-2 focus:ring-gray-400 focus:border-transparent" />
+            </div>
+            <div>
+              <label class="block text-sm font-medium mb-2 text-gray-700 dark:text-gray-300">GitHub Repo (optional):</label>
+              <input type="text" x-model.debounce.500ms="version.repo" placeholder="e.g. typescript" class="w-full px-3 py-2.5 border border-gray-300 dark:border-gray-700 rounded-lg bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100 text-sm focus:ring-2 focus:ring-gray-400 focus:border-transparent" />
+            </div>
+          </div>
+
+          <div x-show="!version.owner || !version.repo">
             <label class="block text-sm font-medium mb-2 text-gray-700 dark:text-gray-300">Version:</label>
             <input type="text" x-model.debounce.500ms="version.version" class="w-full px-3 py-2.5 border border-gray-300 dark:border-gray-700 rounded-lg bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100 text-sm focus:ring-2 focus:ring-gray-400 focus:border-transparent" />
           </div>
@@ -162,8 +173,7 @@ export const rootPageHtml = `<!DOCTYPE html>
             <div class="flex flex-wrap gap-2">
               <button @click="setVersionPreset('1.0.0', '')" class="px-4 py-2 bg-gray-100 dark:bg-gray-800 border border-gray-300 dark:border-gray-700 rounded-lg text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-500 hover:text-white hover:border-gray-500 transition-all duration-200">v1.0.0</button>
               <button @click="setVersionPreset('2.0.0', '1.0.0')" class="px-4 py-2 bg-gray-100 dark:bg-gray-800 border border-gray-300 dark:border-gray-700 rounded-lg text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-500 hover:text-white hover:border-gray-500 transition-all duration-200">v2.0.0 (↑)</button>
-              <button @click="setVersionPreset('v3.2.1', '')" class="px-4 py-2 bg-gray-100 dark:bg-gray-800 border border-gray-300 dark:border-gray-700 rounded-lg text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-500 hover:text-white hover:border-gray-500 transition-all duration-200">v3.2.1</button>
-              <button @click="setVersionPreset('beta', 'alpha')" class="px-4 py-2 bg-gray-100 dark:bg-gray-800 border border-gray-300 dark:border-gray-700 rounded-lg text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-500 hover:text-white hover:border-gray-500 transition-all duration-200">beta</button>
+              <button @click="setVersionGithubPreset('microsoft', 'typescript')" class="px-4 py-2 bg-blue-100 dark:bg-blue-900 border border-blue-300 dark:border-blue-700 rounded-lg text-sm text-blue-700 dark:text-blue-300 hover:bg-blue-500 hover:text-white hover:border-blue-500 transition-all duration-200">GitHub: TypeScript</button>
             </div>
           </div>
         </div>
@@ -298,7 +308,18 @@ export const rootPageHtml = `<!DOCTYPE html>
 
         <!-- Controls -->
         <div class="space-y-4">
-          <div>
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div>
+              <label class="block text-sm font-medium mb-2 text-gray-700 dark:text-gray-300">GitHub Owner (optional):</label>
+              <input type="text" x-model.debounce.500ms="githubStars.owner" placeholder="e.g. microsoft" class="w-full px-3 py-2.5 border border-gray-300 dark:border-gray-700 rounded-lg bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100 text-sm focus:ring-2 focus:ring-gray-400 focus:border-transparent" />
+            </div>
+            <div>
+              <label class="block text-sm font-medium mb-2 text-gray-700 dark:text-gray-300">GitHub Repo (optional):</label>
+              <input type="text" x-model.debounce.500ms="githubStars.repo" placeholder="e.g. typescript" class="w-full px-3 py-2.5 border border-gray-300 dark:border-gray-700 rounded-lg bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100 text-sm focus:ring-2 focus:ring-gray-400 focus:border-transparent" />
+            </div>
+          </div>
+
+          <div x-show="!githubStars.owner || !githubStars.repo">
             <label class="block text-sm font-medium mb-2 text-gray-700 dark:text-gray-300">Stars:</label>
             <input type="text" x-model.debounce.500ms="githubStars.stars" class="w-full px-3 py-2.5 border border-gray-300 dark:border-gray-700 rounded-lg bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100 text-sm focus:ring-2 focus:ring-gray-400 focus:border-transparent" />
           </div>
@@ -312,8 +333,7 @@ export const rootPageHtml = `<!DOCTYPE html>
             <label class="block text-sm font-medium mb-3 text-gray-700 dark:text-gray-300">Quick Presets:</label>
             <div class="flex flex-wrap gap-2">
               <button @click="setGithubStarsPreset('1.2k')" class="px-4 py-2 bg-gray-100 dark:bg-gray-800 border border-gray-300 dark:border-gray-700 rounded-lg text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-500 hover:text-white hover:border-gray-500 transition-all duration-200">1.2k</button>
-              <button @click="setGithubStarsPreset('500')" class="px-4 py-2 bg-gray-100 dark:bg-gray-800 border border-gray-300 dark:border-gray-700 rounded-lg text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-500 hover:text-white hover:border-gray-500 transition-all duration-200">500</button>
-              <button @click="setGithubStarsPreset('10k+')" class="px-4 py-2 bg-gray-100 dark:bg-gray-800 border border-gray-300 dark:border-gray-700 rounded-lg text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-500 hover:text-white hover:border-gray-500 transition-all duration-200">10k+</button>
+              <button @click="setGithubStarsGithubPreset('microsoft', 'typescript')" class="px-4 py-2 bg-blue-100 dark:bg-blue-900 border border-blue-300 dark:border-blue-700 rounded-lg text-sm text-blue-700 dark:text-blue-300 hover:bg-blue-500 hover:text-white hover:border-blue-500 transition-all duration-200">GitHub: TypeScript</button>
             </div>
           </div>
         </div>
@@ -417,7 +437,9 @@ export const rootPageHtml = `<!DOCTYPE html>
         version: {
           version: '1.0.0',
           previousVersion: '',
-          label: ''
+          label: '',
+          owner: '',
+          repo: ''
         },
 
         // Coverage state
@@ -436,7 +458,9 @@ export const rootPageHtml = `<!DOCTYPE html>
         // GitHub Stars state
         githubStars: {
           stars: '1.2k',
-          label: ''
+          label: '',
+          owner: '',
+          repo: ''
         },
 
         // GitHub Issues state
@@ -479,7 +503,13 @@ export const rootPageHtml = `<!DOCTYPE html>
         // Version functions
         versionUrl() {
           const params = new URLSearchParams();
-          params.append('version', this.version.version);
+          if (this.version.owner && this.version.repo) {
+            params.append('owner', this.version.owner);
+            params.append('repo', this.version.repo);
+          } else {
+            params.append('version', this.version.version);
+          }
+          
           if (this.version.previousVersion) params.append('previousVersion', this.version.previousVersion);
           if (this.version.label) params.append('label', this.version.label);
           return '/version?' + params.toString();
@@ -488,6 +518,14 @@ export const rootPageHtml = `<!DOCTYPE html>
         setVersionPreset(version, previousVersion) {
           this.version.version = version;
           this.version.previousVersion = previousVersion;
+          this.version.owner = '';
+          this.version.repo = '';
+          this.version.label = '';
+        },
+
+        setVersionGithubPreset(owner, repo) {
+          this.version.owner = owner;
+          this.version.repo = repo;
           this.version.label = '';
         },
 
@@ -522,13 +560,27 @@ export const rootPageHtml = `<!DOCTYPE html>
         // GitHub Stars functions
         githubStarsUrl() {
           const params = new URLSearchParams();
-          params.append('stars', this.githubStars.stars);
+          if (this.githubStars.owner && this.githubStars.repo) {
+            params.append('owner', this.githubStars.owner);
+            params.append('repo', this.githubStars.repo);
+          } else {
+            params.append('stars', this.githubStars.stars);
+          }
+          
           if (this.githubStars.label) params.append('label', this.githubStars.label);
           return '/github/stars?' + params.toString();
         },
 
         setGithubStarsPreset(stars) {
           this.githubStars.stars = stars;
+          this.githubStars.owner = '';
+          this.githubStars.repo = '';
+          this.githubStars.label = '';
+        },
+
+        setGithubStarsGithubPreset(owner, repo) {
+          this.githubStars.owner = owner;
+          this.githubStars.repo = repo;
           this.githubStars.label = '';
         },
 

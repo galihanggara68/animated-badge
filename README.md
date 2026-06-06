@@ -77,25 +77,46 @@ Experiment with different parameters and see the badges update instantly!
 
 **Animation:** Vertical odometer scroll
 
+**Static Usage:**
 ```markdown
 ![Version](https://badges.datenblick.space/version?version=2.1.0&previousVersion=2.0.5)
 ```
 
+**Dynamic Usage (GitHub Releases):**
+```markdown
+![Version](https://badges.datenblick.space/version?owner=microsoft&repo=typescript)
+```
+
 **Query Parameters:**
-- `version` (required): Current version
+- `owner` (optional): GitHub repository owner
+- `repo` (optional): GitHub repository name
+- `version` (fallback): Current version
 - `previousVersion` (optional): Previous version (triggers animation if different)
 - `label` (optional): Custom label text
 
-**Examples:**
-```bash
-# Version with animation
-/version?version=2.1.0&previousVersion=2.0.5
+---
 
-# Static version (no animation)
-/version?version=1.0.0
+### 5. GitHub Stars Badge (Pulsing animation)
+
+**Trigger:** Badge loads
+
+**Animation:** Star icon pulses continuously with laser sparks
+
+**Static Usage:**
+```markdown
+![Stars](https://badges.datenblick.space/github/stars?stars=1.2k)
 ```
 
----
+**Dynamic Usage (GitHub Repo):**
+```markdown
+![Stars](https://badges.datenblick.space/github/stars?owner=microsoft&repo=typescript)
+```
+
+**Query Parameters:**
+- `owner` (optional): GitHub repository owner
+- `repo` (optional): GitHub repository name
+- `stars` (fallback): Star count (number or string)
+- `label` (optional): Custom label text
 
 ### 3. Coverage Badge (Fill Animation)
 

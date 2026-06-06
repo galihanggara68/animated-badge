@@ -3,13 +3,13 @@
  * Serves animated SVG badges with proper headers
  */
 
-import { BuildStatusBadge, BuildStatus } from './badges/build-status-badge';
-import { VersionBadge } from './badges/version-badge';
-import { CoverageBadge } from './badges/coverage-badge';
-import { LicenseBadge } from './badges/license-badge';
-import { GitHubStarsBadge } from './badges/github-stars-badge';
-import { GithubIssuesBadge } from './badges/github-issues-badge';
-import { rootPageHtml } from './templates/root-page';
+import { BuildStatusBadge, BuildStatus } from "./badges/build-status-badge";
+import { VersionBadge } from "./badges/version-badge";
+import { CoverageBadge } from "./badges/coverage-badge";
+import { LicenseBadge } from "./badges/license-badge";
+import { GitHubStarsBadge } from "./badges/github-stars-badge";
+import { GithubIssuesBadge } from "./badges/github-issues-badge";
+import { rootPageHtml } from "./templates/root-page";
 
 interface Env {
   // Add any environment variables here
@@ -23,7 +23,7 @@ async function fetchGitHubStatus(
   owner: string,
   repo: string,
   branch: string | null,
-  env: Env
+  env: Env,
 ): Promise<BuildStatus | null> {
   let apiUrl = `https://api.github.com/repos/${owner}/${repo}/actions/runs?per_page=1`;
   if (branch) {
@@ -31,12 +31,12 @@ async function fetchGitHubStatus(
   }
 
   const headers: Record<string, string> = {
-    'User-Agent': 'Animated-Badge-Service',
-    Accept: 'application/vnd.github.v3+json',
+    "User-Agent": "Animated-Badge-Service",
+    Accept: "application/vnd.github.v3+json",
   };
 
   if (env.GITHUB_TOKEN) {
-    headers['Authorization'] = `Bearer ${env.GITHUB_TOKEN}`;
+    headers["Authorization"] = `Bearer ${env.GITHUB_TOKEN}`;
   }
 
   try {
@@ -50,7 +50,9 @@ async function fetchGitHubStatus(
     });
 
     if (!response.ok) {
-      console.error(`GitHub API error: ${response.status} ${response.statusText}`);
+      console.error(
+        `GitHub API error: ${response.status} ${response.statusText}`,
+      );
       return null;
     }
 
@@ -62,17 +64,94 @@ async function fetchGitHubStatus(
     const run = data.workflow_runs[0];
 
     // Map GitHub status/conclusion to BuildStatus
-    if (run.status === 'queued' || run.status === 'waiting' || run.status === 'requested') {
-      return 'pending';
-    } else if (run.status === 'in_progress') {
-      return 'running';
-    } else if (run.status === 'completed') {
-      return run.conclusion === 'success' ? 'success' : 'failed';
+    if (
+      run.status === "queued" ||
+      run.status === "waiting" ||
+      run.status === "requested"
+    ) {
+      return "pending";
+    } else if (run.status === "in_progress") {
+      return "running";
+    } else if (run.status === "completed") {
+      return run.conclusion === "success" ? "success" : "failed";
     }
 
     return null;
   } catch (e) {
-    console.error('Failed to fetch from GitHub', e);
+    console.error("Failed to fetch from GitHub", e);
+    return null;
+  }
+}
+
+/**
+ * Format star count into readable string (e.g. 1.2k)
+ */
+function formatStars(count: number): string {
+  if (count >= 1000000) return (count / 1000000).toFixed(1) + "M";
+  if (count >= 1000) return (count / 1000).toFixed(1) + "k";
+  return count.toString();
+}
+
+/**
+ * Fetch the latest stargazers count from GitHub
+ */
+async function fetchGitHubStars(
+  owner: string,
+  repo: string,
+  env: Env,
+): Promise<string | null> {
+  const apiUrl = `https://api.github.com/repos/${owner}/${repo}`;
+
+  const headers: Record<string, string> = {
+    "User-Agent": "Animated-Badge-Service",
+    Accept: "application/vnd.github.v3+json",
+  };
+  if (env.GITHUB_TOKEN) headers["Authorization"] = `Bearer ${env.GITHUB_TOKEN}`;
+
+  try {
+    const response = await fetch(apiUrl, {
+      headers,
+      // @ts-ignore
+      cf: { cacheTtl: 60, cacheEverything: true },
+    });
+
+    if (!response.ok) return null;
+    const data: any = await response.json();
+    return formatStars(data.stargazers_count || 0);
+  } catch (e) {
+    console.error("Failed to fetch stars from GitHub", e);
+    return null;
+  }
+}
+
+/**
+ * Fetch the latest release version from GitHub
+ */
+async function fetchGitHubVersion(
+  owner: string,
+  repo: string,
+  env: Env,
+): Promise<string | null> {
+  const apiUrl = `https://api.github.com/repos/${owner}/${repo}/releases/latest`;
+
+  const headers: Record<string, string> = {
+    "User-Agent": "Animated-Badge-Service",
+    Accept: "application/vnd.github.v3+json",
+  };
+  if (env.GITHUB_TOKEN) headers["Authorization"] = `Bearer ${env.GITHUB_TOKEN}`;
+
+  try {
+    const response = await fetch(apiUrl, {
+      headers,
+      // @ts-ignore
+      cf: { cacheTtl: 60, cacheEverything: true },
+    });
+
+    if (!response.ok) return null;
+    const data: any = await response.json();
+    return data.tag_name || data.name || null;
+  } catch (e) {
+    console.error("Failed to fetch version from GitHub", e);
     return null;
   }
 }
@@ -84,21 +163,21 @@ export default {
 
     try {
       // Route to appropriate badge handler
-      if (path.startsWith('/build-status')) {
+      if (path.startsWith("/build-status")) {
         return handleBuildStatusBadge(url, env);
-      } else if (path.startsWith('/version')) {
-        return handleVersionBadge(url);
-      } else if (path.startsWith('/coverage')) {
+      } else if (path.startsWith("/version")) {
+        return handleVersionBadge(url, env);
+      } else if (path.startsWith("/coverage")) {
         return handleCoverageBadge(url);
-      } else if (path.startsWith('/license')) {
+      } else if (path.startsWith("/license")) {
         return handleLicenseBadge(url);
-      } else if (path.startsWith('/github/stars')) {
-        return handleGitHubStarsBadge(url);
-      } else if (path.startsWith('/github/issues')) {
+      } else if (path.startsWith("/github/stars")) {
+        return handleGitHubStarsBadge(url, env);
+      } else if (path.startsWith("/github/issues")) {
         return handleGithubIssuesBadge(url);
-      } else if (path === '/') {
+      } else if (path === "/") {
         return handleRootPage();
-      } else if (path === '/health') {
+      } else if (path === "/health") {
         return handleHealthCheck();
       } else {
         return handleNotFound();
@@ -114,11 +193,11 @@ export default {
  * Query params: owner, repo, branch, status (success|failed|pending|running), label, message
  */
 async function handleBuildStatusBadge(url: URL, env: Env): Promise<Response> {
-  const owner = url.searchParams.get('owner');
-  const repo = url.searchParams.get('repo');
-  const branch = url.searchParams.get('branch');
+  const owner = url.searchParams.get("owner");
+  const repo = url.searchParams.get("repo");
+  const branch = url.searchParams.get("branch");
 
-  let status: BuildStatus = 'success';
+  let status: BuildStatus = "success";
 
   if (owner && repo) {
     const githubStatus = await fetchGitHubStatus(owner, repo, branch, env);
@@ -126,22 +205,32 @@ async function handleBuildStatusBadge(url: URL, env: Env): Promise<Response> {
       status = githubStatus;
     } else {
       // Fallback if GitHub fetch fails
-      const statusParam = url.searchParams.get('status');
-      const validStatuses: BuildStatus[] = ['success', 'failed', 'pending', 'running'];
+      const statusParam = url.searchParams.get("status");
+      const validStatuses: BuildStatus[] = [
+        "success",
+        "failed",
+        "pending",
+        "running",
+      ];
       status = validStatuses.includes(statusParam as BuildStatus)
         ? (statusParam as BuildStatus)
-        : 'success';
+        : "success";
     }
   } else {
-    const statusParam = url.searchParams.get('status');
-    const validStatuses: BuildStatus[] = ['success', 'failed', 'pending', 'running'];
+    const statusParam = url.searchParams.get("status");
+    const validStatuses: BuildStatus[] = [
+      "success",
+      "failed",
+      "pending",
+      "running",
+    ];
     status = validStatuses.includes(statusParam as BuildStatus)
       ? (statusParam as BuildStatus)
-      : 'success';
+      : "success";
   }
 
-  const label = url.searchParams.get('label') || undefined;
-  const message = url.searchParams.get('message') || undefined;
+  const label = url.searchParams.get("label") || undefined;
+  const message = url.searchParams.get("message") || undefined;
 
   const badge = new BuildStatusBadge({ status, label, message });
   const svg = badge.generate();
@@ -151,12 +240,23 @@ async function handleBuildStatusBadge(url: URL, env: Env): Promise<Response> {
 
 /**
  * Handle version badge requests
- * Query params: version, previousVersion, label
+ * Query params: owner, repo, version, previousVersion, label
  */
-async function handleVersionBadge(url: URL): Promise<Response> {
-  const version = url.searchParams.get('version')?.trim() || '0.0.0';
-  const previousVersion = url.searchParams.get('previousVersion')?.trim() || undefined;
-  const label = url.searchParams.get('label') || undefined;
+async function handleVersionBadge(url: URL, env: Env): Promise<Response> {
+  const owner = url.searchParams.get("owner");
+  const repo = url.searchParams.get("repo");
+  let version = url.searchParams.get("version")?.trim() || "0.0.0";
+
+  if (owner && repo) {
+    const fetchedVersion = await fetchGitHubVersion(owner, repo, env);
+    if (fetchedVersion) {
+      version = fetchedVersion;
+    }
+  }
+
+  const previousVersion =
+    url.searchParams.get("previousVersion")?.trim() || undefined;
+  const label = url.searchParams.get("label") || undefined;
 
   const badge = new VersionBadge({ version, previousVersion, label });
   const svg = badge.generate();
@@ -169,7 +269,7 @@ async function handleVersionBadge(url: URL): Promise<Response> {
  * Query params: coverage (number), label
  */
 async function handleCoverageBadge(url: URL): Promise<Response> {
-  const coverageParam = url.searchParams.get('coverage');
+  const coverageParam = url.searchParams.get("coverage");
   let coverage = 0;
 
   // Parse and validate coverage percentage
@@ -180,7 +280,7 @@ async function handleCoverageBadge(url: URL): Promise<Response> {
     }
   }
 
-  const label = url.searchParams.get('label') || undefined;
+  const label = url.searchParams.get("label") || undefined;
 
   const badge = new CoverageBadge({ coveragePercentage: coverage, label });
   const svg = badge.generate();
@@ -193,8 +293,8 @@ async function handleCoverageBadge(url: URL): Promise<Response> {
  * Query params: license, label
  */
 async function handleLicenseBadge(url: URL): Promise<Response> {
-  const license = url.searchParams.get('license')?.trim() || 'MIT';
-  const label = url.searchParams.get('label') || undefined;
+  const license = url.searchParams.get("license")?.trim() || "MIT";
+  const label = url.searchParams.get("label") || undefined;
 
   const badge = new LicenseBadge({ license, label });
   const svg = badge.generate();
@@ -204,11 +304,21 @@ async function handleLicenseBadge(url: URL): Promise<Response> {
 
 /**
  * Handle GitHub stars badge requests
- * Query params: stars (number|string), label
+ * Query params: owner, repo, stars (number|string), label
  */
-async function handleGitHubStarsBadge(url: URL): Promise<Response> {
-  const stars = url.searchParams.get('stars')?.trim() || '0';
-  const label = url.searchParams.get('label') || undefined;
+async function handleGitHubStarsBadge(url: URL, env: Env): Promise<Response> {
+  const owner = url.searchParams.get("owner");
+  const repo = url.searchParams.get("repo");
+  let stars = url.searchParams.get("stars")?.trim() || "0";
+
+  if (owner && repo) {
+    const fetchedStars = await fetchGitHubStars(owner, repo, env);
+    if (fetchedStars) {
+      stars = fetchedStars;
+    }
+  }
+
+  const label = url.searchParams.get("label") || undefined;
 
   const badge = new GitHubStarsBadge({ stars, label });
   const svg = badge.generate();
@@ -221,9 +331,9 @@ async function handleGitHubStarsBadge(url: URL): Promise<Response> {
  * Query params: open (number), closed (number), label
  */
 async function handleGithubIssuesBadge(url: URL): Promise<Response> {
-  const openParam = url.searchParams.get('open') || '0';
-  const closedParam = url.searchParams.get('closed') || '0';
-  const label = url.searchParams.get('label') || undefined;
+  const openParam = url.searchParams.get("open") || "0";
+  const closedParam = url.searchParams.get("closed") || "0";
+  const label = url.searchParams.get("label") || undefined;
 
   const open = parseInt(openParam, 10) || 0;
   const closed = parseInt(closedParam, 10) || 0;
@@ -240,8 +350,8 @@ async function handleGithubIssuesBadge(url: URL): Promise<Response> {
 function handleRootPage(): Response {
   return new Response(rootPageHtml, {
     headers: {
-      'Content-Type': 'text/html;charset=UTF-8',
-      'Cache-Control': 'public, max-age=3600',
+      "Content-Type": "text/html;charset=UTF-8",
+      "Cache-Control": "public, max-age=3600",
     },
   });
 }
@@ -252,24 +362,24 @@ function handleRootPage(): Response {
 function handleHealthCheck(): Response {
   return new Response(
     JSON.stringify({
-      status: 'ok',
-      service: 'Animated Badge API',
-      version: '1.0.0',
+      status: "ok",
+      service: "Animated Badge API",
+      version: "1.0.0",
       endpoints: [
-        '/build-status',
-        '/version',
-        '/coverage',
-        '/license',
-        '/github/stars',
-        '/github/issues',
+        "/build-status",
+        "/version",
+        "/coverage",
+        "/license",
+        "/github/stars",
+        "/github/issues",
       ],
     }),
     {
       headers: {
-        'Content-Type': 'application/json',
-        'Access-Control-Allow-Origin': '*',
+        "Content-Type": "application/json",
+        "Access-Control-Allow-Origin": "*",
       },
-    }
+    },
   );
 }
 
@@ -279,16 +389,16 @@ function handleHealthCheck(): Response {
 function handleNotFound(): Response {
   return new Response(
     JSON.stringify({
-      error: 'Not Found',
-      message: 'Badge endpoint not found.',
+      error: "Not Found",
+      message: "Badge endpoint not found.",
     }),
     {
       status: 404,
       headers: {
-        'Content-Type': 'application/json',
-        'Access-Control-Allow-Origin': '*',
+        "Content-Type": "application/json",
+        "Access-Control-Allow-Origin": "*",
       },
-    }
+    },
   );
 }
 
@@ -296,20 +406,20 @@ function handleNotFound(): Response {
  * Handle errors
  */
 function handleError(error: unknown): Response {
-  console.error('Badge generation error:', error);
+  console.error("Badge generation error:", error);
 
   return new Response(
     JSON.stringify({
-      error: 'Internal Server Error',
-      message: error instanceof Error ? error.message : 'Unknown error',
+      error: "Internal Server Error",
+      message: error instanceof Error ? error.message : "Unknown error",
     }),
     {
       status: 500,
       headers: {
-        'Content-Type': 'application/json',
-        'Access-Control-Allow-Origin': '*',
+        "Content-Type": "application/json",
+        "Access-Control-Allow-Origin": "*",
       },
-    }
+    },
   );
 }
 
@@ -320,9 +430,9 @@ function handleError(error: unknown): Response {
 function createSvgResponse(svg: string): Response {
   return new Response(svg, {
     headers: {
-      'Content-Type': 'image/svg+xml',
-      'Cache-Control': 'no-cache, no-store, must-revalidate',
-      'Access-Control-Allow-Origin': '*',
+      "Content-Type": "image/svg+xml",
+      "Cache-Control": "no-cache, no-store, must-revalidate",
+      "Access-Control-Allow-Origin": "*",
     },
   });
 }
