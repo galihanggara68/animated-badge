@@ -79,17 +79,17 @@ export const rootPageHtml = `<!DOCTYPE html>
           <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
               <label class="block text-sm font-medium mb-2 text-gray-700 dark:text-gray-300">GitHub Owner (optional):</label>
-              <input type="text" x-model="buildStatus.owner" placeholder="e.g. microsoft" class="w-full px-3 py-2.5 border border-gray-300 dark:border-gray-700 rounded-lg bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100 text-sm focus:ring-2 focus:ring-gray-400 focus:border-transparent" />
+              <input type="text" x-model.debounce.500ms="buildStatus.owner" placeholder="e.g. microsoft" class="w-full px-3 py-2.5 border border-gray-300 dark:border-gray-700 rounded-lg bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100 text-sm focus:ring-2 focus:ring-gray-400 focus:border-transparent" />
             </div>
             <div>
               <label class="block text-sm font-medium mb-2 text-gray-700 dark:text-gray-300">GitHub Repo (optional):</label>
-              <input type="text" x-model="buildStatus.repo" placeholder="e.g. typescript" class="w-full px-3 py-2.5 border border-gray-300 dark:border-gray-700 rounded-lg bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100 text-sm focus:ring-2 focus:ring-gray-400 focus:border-transparent" />
+              <input type="text" x-model.debounce.500ms="buildStatus.repo" placeholder="e.g. typescript" class="w-full px-3 py-2.5 border border-gray-300 dark:border-gray-700 rounded-lg bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100 text-sm focus:ring-2 focus:ring-gray-400 focus:border-transparent" />
             </div>
           </div>
 
           <div x-show="!buildStatus.owner || !buildStatus.repo">
             <label class="block text-sm font-medium mb-2 text-gray-700 dark:text-gray-300">Static Status:</label>
-            <select x-model="buildStatus.status" class="w-full px-3 py-2.5 border border-gray-300 dark:border-gray-700 rounded-lg bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100 text-sm focus:ring-2 focus:ring-gray-400 focus:border-transparent">
+            <select x-model.debounce.500ms="buildStatus.status" class="w-full px-3 py-2.5 border border-gray-300 dark:border-gray-700 rounded-lg bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100 text-sm focus:ring-2 focus:ring-gray-400 focus:border-transparent">
               <option value="success">Success</option>
               <option value="failed">Failed</option>
               <option value="pending">Pending</option>
@@ -99,12 +99,12 @@ export const rootPageHtml = `<!DOCTYPE html>
 
           <div>
             <label class="block text-sm font-medium mb-2 text-gray-700 dark:text-gray-300">Label:</label>
-            <input type="text" x-model="buildStatus.label" placeholder="build" class="w-full px-3 py-2.5 border border-gray-300 dark:border-gray-700 rounded-lg bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100 text-sm focus:ring-2 focus:ring-gray-400 focus:border-transparent" />
+            <input type="text" x-model.debounce.500ms="buildStatus.label" placeholder="build" class="w-full px-3 py-2.5 border border-gray-300 dark:border-gray-700 rounded-lg bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100 text-sm focus:ring-2 focus:ring-gray-400 focus:border-transparent" />
           </div>
 
           <div x-show="!buildStatus.owner || !buildStatus.repo">
             <label class="block text-sm font-medium mb-2 text-gray-700 dark:text-gray-300">Message Override:</label>
-            <input type="text" x-model="buildStatus.message" placeholder="auto" class="w-full px-3 py-2.5 border border-gray-300 dark:border-gray-700 rounded-lg bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100 text-sm focus:ring-2 focus:ring-gray-400 focus:border-transparent" />
+            <input type="text" x-model.debounce.500ms="buildStatus.message" placeholder="auto" class="w-full px-3 py-2.5 border border-gray-300 dark:border-gray-700 rounded-lg bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100 text-sm focus:ring-2 focus:ring-gray-400 focus:border-transparent" />
           </div>
 
           <div>
@@ -144,17 +144,17 @@ export const rootPageHtml = `<!DOCTYPE html>
         <div class="space-y-4">
           <div>
             <label class="block text-sm font-medium mb-2 text-gray-700 dark:text-gray-300">Version:</label>
-            <input type="text" x-model="version.version" class="w-full px-3 py-2.5 border border-gray-300 dark:border-gray-700 rounded-lg bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100 text-sm focus:ring-2 focus:ring-gray-400 focus:border-transparent" />
+            <input type="text" x-model.debounce.500ms="version.version" class="w-full px-3 py-2.5 border border-gray-300 dark:border-gray-700 rounded-lg bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100 text-sm focus:ring-2 focus:ring-gray-400 focus:border-transparent" />
           </div>
 
           <div>
             <label class="block text-sm font-medium mb-2 text-gray-700 dark:text-gray-300">Previous Version:</label>
-            <input type="text" x-model="version.previousVersion" placeholder="optional" class="w-full px-3 py-2.5 border border-gray-300 dark:border-gray-700 rounded-lg bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100 text-sm focus:ring-2 focus:ring-gray-400 focus:border-transparent" />
+            <input type="text" x-model.debounce.500ms="version.previousVersion" placeholder="optional" class="w-full px-3 py-2.5 border border-gray-300 dark:border-gray-700 rounded-lg bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100 text-sm focus:ring-2 focus:ring-gray-400 focus:border-transparent" />
           </div>
 
           <div>
             <label class="block text-sm font-medium mb-2 text-gray-700 dark:text-gray-300">Label:</label>
-            <input type="text" x-model="version.label" placeholder="version" class="w-full px-3 py-2.5 border border-gray-300 dark:border-gray-700 rounded-lg bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100 text-sm focus:ring-2 focus:ring-gray-400 focus:border-transparent" />
+            <input type="text" x-model.debounce.500ms="version.label" placeholder="version" class="w-full px-3 py-2.5 border border-gray-300 dark:border-gray-700 rounded-lg bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100 text-sm focus:ring-2 focus:ring-gray-400 focus:border-transparent" />
           </div>
 
           <div>
@@ -195,12 +195,12 @@ export const rootPageHtml = `<!DOCTYPE html>
         <div class="space-y-4">
           <div>
             <label class="block text-sm font-medium mb-2 text-gray-700 dark:text-gray-300">Coverage (%):</label>
-            <input type="number" x-model="coverage.coverage" min="0" max="100" class="w-full px-3 py-2.5 border border-gray-300 dark:border-gray-700 rounded-lg bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100 text-sm focus:ring-2 focus:ring-gray-400 focus:border-transparent" />
+            <input type="number" x-model.debounce.500ms="coverage.coverage" min="0" max="100" class="w-full px-3 py-2.5 border border-gray-300 dark:border-gray-700 rounded-lg bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100 text-sm focus:ring-2 focus:ring-gray-400 focus:border-transparent" />
           </div>
 
           <div>
             <label class="block text-sm font-medium mb-2 text-gray-700 dark:text-gray-300">Label:</label>
-            <input type="text" x-model="coverage.label" placeholder="coverage" class="w-full px-3 py-2.5 border border-gray-300 dark:border-gray-700 rounded-lg bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100 text-sm focus:ring-2 focus:ring-gray-400 focus:border-transparent" />
+            <input type="text" x-model.debounce.500ms="coverage.label" placeholder="coverage" class="w-full px-3 py-2.5 border border-gray-300 dark:border-gray-700 rounded-lg bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100 text-sm focus:ring-2 focus:ring-gray-400 focus:border-transparent" />
           </div>
 
           <div>
@@ -241,7 +241,7 @@ export const rootPageHtml = `<!DOCTYPE html>
         <div class="space-y-4">
           <div>
             <label class="block text-sm font-medium mb-2 text-gray-700 dark:text-gray-300">License:</label>
-            <select x-model="license.license" class="w-full px-3 py-2.5 border border-gray-300 dark:border-gray-700 rounded-lg bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100 text-sm focus:ring-2 focus:ring-gray-400 focus:border-transparent">
+            <select x-model.debounce.500ms="license.license" class="w-full px-3 py-2.5 border border-gray-300 dark:border-gray-700 rounded-lg bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100 text-sm focus:ring-2 focus:ring-gray-400 focus:border-transparent">
               <option value="MIT">MIT</option>
               <option value="Apache-2.0">Apache-2.0</option>
               <option value="GPL-3.0">GPL-3.0</option>
@@ -254,12 +254,12 @@ export const rootPageHtml = `<!DOCTYPE html>
 
           <div>
             <label class="block text-sm font-medium mb-2 text-gray-700 dark:text-gray-300">Label:</label>
-            <input type="text" x-model="license.label" placeholder="license" class="w-full px-3 py-2.5 border border-gray-300 dark:border-gray-700 rounded-lg bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100 text-sm focus:ring-2 focus:ring-gray-400 focus:border-transparent" />
+            <input type="text" x-model.debounce.500ms="license.label" placeholder="license" class="w-full px-3 py-2.5 border border-gray-300 dark:border-gray-700 rounded-lg bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100 text-sm focus:ring-2 focus:ring-gray-400 focus:border-transparent" />
           </div>
 
           <div>
             <label class="block text-sm font-medium mb-2 text-gray-700 dark:text-gray-300">Shimmer Interval (seconds):</label>
-            <input type="number" x-model="license.shimmerInterval" min="5" max="10" class="w-full px-3 py-2.5 border border-gray-300 dark:border-gray-700 rounded-lg bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100 text-sm focus:ring-2 focus:ring-gray-400 focus:border-transparent" />
+            <input type="number" x-model.debounce.500ms="license.shimmerInterval" min="5" max="10" class="w-full px-3 py-2.5 border border-gray-300 dark:border-gray-700 rounded-lg bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100 text-sm focus:ring-2 focus:ring-gray-400 focus:border-transparent" />
           </div>
 
           <div>
@@ -300,12 +300,12 @@ export const rootPageHtml = `<!DOCTYPE html>
         <div class="space-y-4">
           <div>
             <label class="block text-sm font-medium mb-2 text-gray-700 dark:text-gray-300">Stars:</label>
-            <input type="text" x-model="githubStars.stars" class="w-full px-3 py-2.5 border border-gray-300 dark:border-gray-700 rounded-lg bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100 text-sm focus:ring-2 focus:ring-gray-400 focus:border-transparent" />
+            <input type="text" x-model.debounce.500ms="githubStars.stars" class="w-full px-3 py-2.5 border border-gray-300 dark:border-gray-700 rounded-lg bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100 text-sm focus:ring-2 focus:ring-gray-400 focus:border-transparent" />
           </div>
 
           <div>
             <label class="block text-sm font-medium mb-2 text-gray-700 dark:text-gray-300">Label:</label>
-            <input type="text" x-model="githubStars.label" placeholder="stars" class="w-full px-3 py-2.5 border border-gray-300 dark:border-gray-700 rounded-lg bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100 text-sm focus:ring-2 focus:ring-gray-400 focus:border-transparent" />
+            <input type="text" x-model.debounce.500ms="githubStars.label" placeholder="stars" class="w-full px-3 py-2.5 border border-gray-300 dark:border-gray-700 rounded-lg bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100 text-sm focus:ring-2 focus:ring-gray-400 focus:border-transparent" />
           </div>
 
           <div>
@@ -346,17 +346,17 @@ export const rootPageHtml = `<!DOCTYPE html>
           <div class="grid grid-cols-2 gap-4">
             <div>
               <label class="block text-sm font-medium mb-2 text-gray-700 dark:text-gray-300">Open:</label>
-              <input type="number" x-model="githubIssues.open" min="0" class="w-full px-3 py-2.5 border border-gray-300 dark:border-gray-700 rounded-lg bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100 text-sm focus:ring-2 focus:ring-gray-400 focus:border-transparent" />
+              <input type="number" x-model.debounce.500ms="githubIssues.open" min="0" class="w-full px-3 py-2.5 border border-gray-300 dark:border-gray-700 rounded-lg bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100 text-sm focus:ring-2 focus:ring-gray-400 focus:border-transparent" />
             </div>
             <div>
               <label class="block text-sm font-medium mb-2 text-gray-700 dark:text-gray-300">Closed:</label>
-              <input type="number" x-model="githubIssues.closed" min="0" class="w-full px-3 py-2.5 border border-gray-300 dark:border-gray-700 rounded-lg bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100 text-sm focus:ring-2 focus:ring-gray-400 focus:border-transparent" />
+              <input type="number" x-model.debounce.500ms="githubIssues.closed" min="0" class="w-full px-3 py-2.5 border border-gray-300 dark:border-gray-700 rounded-lg bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100 text-sm focus:ring-2 focus:ring-gray-400 focus:border-transparent" />
             </div>
           </div>
 
           <div>
             <label class="block text-sm font-medium mb-2 text-gray-700 dark:text-gray-300">Label:</label>
-            <input type="text" x-model="githubIssues.label" placeholder="issues" class="w-full px-3 py-2.5 border border-gray-300 dark:border-gray-700 rounded-lg bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100 text-sm focus:ring-2 focus:ring-gray-400 focus:border-transparent" />
+            <input type="text" x-model.debounce.500ms="githubIssues.label" placeholder="issues" class="w-full px-3 py-2.5 border border-gray-300 dark:border-gray-700 rounded-lg bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100 text-sm focus:ring-2 focus:ring-gray-400 focus:border-transparent" />
           </div>
 
           <div>
