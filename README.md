@@ -1,4 +1,5 @@
 # Animated SVG Badge System
+![License](https://badges.datenblick.space/license?license=MIT&shimmerInterval=5)
 
 A production-ready animated badge system using **pure SVG animations** (no CSS, no JavaScript) served via Cloudflare Workers.
 
